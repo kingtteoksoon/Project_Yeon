@@ -46,21 +46,21 @@ protected:
 	TObjectPtr<UInputAction> JumpAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> WalkAction;
+	TObjectPtr<UInputAction> RunAction;
 
 	// ── 이동 ─────────────────────────────────────────────────
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 
-	// 기본=뛰기(RunSpeed). WalkAction 홀드 중 걷기(WalkSpeed)
-	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "0"))
-	float RunSpeed = 600.f;
-
+	// 기본=걷기(WalkSpeed). RunAction 홀드 중 뛰기(RunSpeed)
 	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "0"))
 	float WalkSpeed = 200.f;
 
-	void StartWalk();
-	void StopWalk();
+	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "0"))
+	float RunSpeed = 600.f;
+
+	void StartRun();
+	void StopRun();
 
 	// ── Dash ─────────────────────────────────────────────────
 

@@ -29,7 +29,7 @@ ABaekYonCharacter::ABaekYonCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
-	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed; // 기본=걷기
 
 	// ── 점프 ─────────────────────────────────────────────────
 	GetCharacterMovement()->JumpZVelocity = 500.f;
@@ -78,22 +78,22 @@ void ABaekYonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 			EIC->BindAction(JumpAction, ETriggerEvent::Started,   this, &ACharacter::Jump);
 			EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		}
-		if (WalkAction)
+		if (RunAction)
 		{
-			EIC->BindAction(WalkAction, ETriggerEvent::Started,   this, &ABaekYonCharacter::StartWalk);
-			EIC->BindAction(WalkAction, ETriggerEvent::Completed, this, &ABaekYonCharacter::StopWalk);
+			EIC->BindAction(RunAction, ETriggerEvent::Started,   this, &ABaekYonCharacter::StartRun);
+			EIC->BindAction(RunAction, ETriggerEvent::Completed, this, &ABaekYonCharacter::StopRun);
 		}
 	}
 }
 
-void ABaekYonCharacter::StartWalk()
-{
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-}
-
-void ABaekYonCharacter::StopWalk()
+void ABaekYonCharacter::StartRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+}
+
+void ABaekYonCharacter::StopRun()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 }
 
 // ── 이동 ─────────────────────────────────────────────────────────────────────

@@ -29,7 +29,13 @@ ABaekYonCharacter::ABaekYonCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+
+	// ── 점프 ─────────────────────────────────────────────────
+	GetCharacterMovement()->JumpZVelocity = 500.f;
+	GetCharacterMovement()->AirControl = 0.35f;
+	GetCharacterMovement()->BrakingDecelerationFalling = 1500.f;
+	JumpMaxCount = 1;
 }
 
 void ABaekYonCharacter::BeginPlay()
@@ -67,7 +73,27 @@ void ABaekYonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		{
 			EIC->BindAction(DashAction, ETriggerEvent::Started, this, &ABaekYonCharacter::Dash);
 		}
+		if (JumpAction)
+		{
+			EIC->BindAction(JumpAction, ETriggerEvent::Started,   this, &ACharacter::Jump);
+			EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		}
+		if (WalkAction)
+		{
+			EIC->BindAction(WalkAction, ETriggerEvent::Started,   this, &ABaekYonCharacter::StartWalk);
+			EIC->BindAction(WalkAction, ETriggerEvent::Completed, this, &ABaekYonCharacter::StopWalk);
+		}
 	}
+}
+
+void ABaekYonCharacter::StartWalk()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+}
+
+void ABaekYonCharacter::StopWalk()
+{
+	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 }
 
 // ── 이동 ─────────────────────────────────────────────────────────────────────
@@ -81,8 +107,8 @@ void ABaekYonCharacter::Move(const FInputActionValue& Value)
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector Right   = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(Forward, Axis.X);  // W/S → X축
-	AddMovementInput(Right,   Axis.Y);  // D/A → Y축
+	AddMovementInput(Forward, Axis.Y);  // W/S → Y축 (Epic 표준)
+	AddMovementInput(Right,   Axis.X);  // A/D → X축
 }
 
 void ABaekYonCharacter::Look(const FInputActionValue& Value)

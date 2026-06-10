@@ -1,0 +1,35 @@
+# Unreal Engine
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+*.VC.db
+*.opensdf
+*.opendb
+*.sdf
+*.sln
+*.suo
+*.xcworkspace
+*.xcodeproj
+*_BuiltData.uasset
+
+# Visual Studio
+.vs/
+*.user
+
+# JetBrains Rider
+.idea/
+*.DotSettings.user
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Editor-only plugins (optional, remove if needed)
+Plugins/*/Binaries/
+Plugins/*/Intermediate/

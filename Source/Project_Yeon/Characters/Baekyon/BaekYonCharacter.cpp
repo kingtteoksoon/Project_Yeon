@@ -81,8 +81,8 @@ void ABaekYonCharacter::Move(const FInputActionValue& Value)
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector Right   = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(Forward, Axis.Y);
-	AddMovementInput(Right,   Axis.X);
+	AddMovementInput(Forward, Axis.X);  // W/S → X축
+	AddMovementInput(Right,   Axis.Y);  // D/A → Y축
 }
 
 void ABaekYonCharacter::Look(const FInputActionValue& Value)

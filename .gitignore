@@ -33,3 +33,6 @@ desktop.ini
 # Editor-only plugins (optional, remove if needed)
 Plugins/*/Binaries/
 Plugins/*/Intermediate/
+
+# Local Claude Code config / memory
+.claude/

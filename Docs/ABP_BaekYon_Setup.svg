@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1360" viewBox="0 0 1040 1360" font-family="'Malgun Gothic','Segoe UI',sans-serif">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#cfcfcf"/>
+    </marker>
+    <marker id="arrowG" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#7ec46b"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1040" height="1360" fill="#1b1b1d"/>
+
+  <!-- ===== Title ===== -->
+  <text x="40" y="48" fill="#ffffff" font-size="26" font-weight="bold">ABP_BaekYon — 애니메이션 블루프린트 구성도</text>
+  <text x="40" y="76" fill="#9a9a9a" font-size="15">부모 클래스: BaekYonAnimInstance (C++)  ·  노출 변수: GroundSpeed(float) / bShouldMove(bool) / bIsFalling(bool)</text>
+  <line x1="40" y1="92" x2="1000" y2="92" stroke="#3a3a3a" stroke-width="1"/>
+
+  <!-- ===== Section 1: AnimGraph ===== -->
+  <text x="40" y="130" fill="#6db3f2" font-size="18" font-weight="bold">① AnimGraph (최상위)</text>
+
+  <!-- State Machine node -->
+  <rect x="80" y="150" width="260" height="92" rx="6" fill="#2a3340" stroke="#4a6075" stroke-width="1.5"/>
+  <rect x="80" y="150" width="260" height="28" rx="6" fill="#3a5169"/>
+  <text x="96" y="170" fill="#ffffff" font-size="15" font-weight="bold">State Machine: Locomotion</text>
+  <text x="96" y="206" fill="#cfcfcf" font-size="13">상태 흐름을 담는 컨테이너</text>
+  <circle cx="332" cy="215" r="5" fill="#7ec46b"/>
+  <text x="96" y="232" fill="#8a8a8a" font-size="12">(더블클릭 → ② 내부)</text>
+
+  <!-- Output Pose node -->
+  <rect x="540" y="150" width="220" height="92" rx="6" fill="#33302a" stroke="#75664a" stroke-width="1.5"/>
+  <rect x="540" y="150" width="220" height="28" rx="6" fill="#5a4f38"/>
+  <text x="556" y="170" fill="#ffffff" font-size="15" font-weight="bold">Output Pose</text>
+  <text x="556" y="210" fill="#cfcfcf" font-size="13">최종 포즈 출력</text>
+  <circle cx="548" cy="215" r="5" fill="#7ec46b"/>
+
+  <path d="M337,215 C420,215 460,215 543,215" stroke="#7ec46b" stroke-width="2.5" fill="none" marker-end="url(#arrowG)"/>
+
+  <line x1="40" y1="280" x2="1000" y2="280" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- ===== Section 2: State Machine internals ===== -->
+  <text x="40" y="318" fill="#6db3f2" font-size="18" font-weight="bold">② State Machine 내부</text>
+
+  <!-- Entry -->
+  <ellipse cx="150" cy="380" rx="46" ry="24" fill="#3a3a3a" stroke="#666" stroke-width="1.5"/>
+  <text x="150" y="385" fill="#ddd" font-size="13" text-anchor="middle">Entry</text>
+
+  <!-- Ground state -->
+  <rect x="300" y="346" width="220" height="70" rx="8" fill="#26331f" stroke="#5e8a4a" stroke-width="2"/>
+  <text x="410" y="378" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">Ground</text>
+  <text x="410" y="400" fill="#bcd6ad" font-size="12" text-anchor="middle">BS_BaekYonLocomotion (③)</text>
+
+  <!-- Air state -->
+  <rect x="680" y="346" width="220" height="70" rx="8" fill="#2a2638" stroke="#7160a0" stroke-width="2"/>
+  <text x="790" y="378" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">Air</text>
+  <text x="790" y="400" fill="#c8bce0" font-size="12" text-anchor="middle">Jump_Anim</text>
+
+  <!-- Entry -> Ground -->
+  <path d="M196,380 L296,380" stroke="#cfcfcf" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- Ground -> Air (top arc) -->
+  <path d="M520,366 C580,338 620,338 680,366" stroke="#cfcfcf" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <rect x="556" y="318" width="170" height="24" rx="4" fill="#1b1b1d"/>
+  <text x="641" y="335" fill="#f2c14e" font-size="13" text-anchor="middle" font-weight="bold">bIsFalling == true</text>
+
+  <!-- Air -> Ground (bottom arc) -->
+  <path d="M680,398 C620,426 580,426 520,398" stroke="#cfcfcf" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <rect x="552" y="430" width="178" height="24" rx="4" fill="#1b1b1d"/>
+  <text x="641" y="447" fill="#f2c14e" font-size="13" text-anchor="middle" font-weight="bold">bIsFalling == false</text>
+
+  <line x1="40" y1="490" x2="1000" y2="490" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- ===== Section 3: Ground state internals (Blend Space node) ===== -->
+  <text x="40" y="528" fill="#6db3f2" font-size="18" font-weight="bold">③ Ground 상태 내부</text>
+
+  <!-- GroundSpeed variable -->
+  <rect x="80" y="560" width="210" height="56" rx="6" fill="#2d2d2d" stroke="#555" stroke-width="1.5"/>
+  <text x="96" y="584" fill="#7ec46b" font-size="14" font-weight="bold">GroundSpeed</text>
+  <text x="96" y="604" fill="#9a9a9a" font-size="12">float (C++ 변수)</text>
+  <circle cx="282" cy="588" r="5" fill="#7ec46b"/>
+
+  <!-- Blend Space player -->
+  <rect x="400" y="540" width="280" height="96" rx="6" fill="#26331f" stroke="#5e8a4a" stroke-width="1.5"/>
+  <rect x="400" y="540" width="280" height="28" rx="6" fill="#3c5a2c"/>
+  <text x="416" y="560" fill="#ffffff" font-size="14" font-weight="bold">Blendspace Player</text>
+  <text x="416" y="588" fill="#cfcfcf" font-size="13">BS_BaekYonLocomotion</text>
+  <circle cx="408" cy="600" r="5" fill="#7ec46b"/>
+  <text x="420" y="604" fill="#9a9a9a" font-size="12">Speed (입력)</text>
+  <circle cx="672" cy="582" r="5" fill="#7ec46b"/>
+
+  <!-- Output Pose (ground) -->
+  <rect x="780" y="556" width="180" height="64" rx="6" fill="#33302a" stroke="#75664a" stroke-width="1.5"/>
+  <text x="870" y="592" fill="#ffffff" font-size="14" font-weight="bold" text-anchor="middle">Output Pose</text>
+  <circle cx="788" cy="588" r="5" fill="#7ec46b"/>
+
+  <path d="M287,588 C330,588 360,600 405,600" stroke="#7ec46b" stroke-width="2.5" fill="none" marker-end="url(#arrowG)"/>
+  <path d="M677,582 C710,582 745,588 783,588" stroke="#7ec46b" stroke-width="2.5" fill="none" marker-end="url(#arrowG)"/>
+
+  <line x1="40" y1="680" x2="1000" y2="680" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- ===== Section 4: Blend Space 1D axis ===== -->
+  <text x="40" y="718" fill="#6db3f2" font-size="18" font-weight="bold">④ BS_BaekYonLocomotion (Blend Space 1D)</text>
+  <text x="40" y="742" fill="#9a9a9a" font-size="14">Horizontal Axis Name = Speed  ·  Maximum Axis Value = 600</text>
+
+  <!-- axis line -->
+  <line x1="120" y1="820" x2="920" y2="820" stroke="#888" stroke-width="2"/>
+  <!-- ticks -->
+  <line x1="120" y1="812" x2="120" y2="828" stroke="#888" stroke-width="2"/>
+  <line x1="387" y1="812" x2="387" y2="828" stroke="#888" stroke-width="2"/>
+  <line x1="920" y1="812" x2="920" y2="828" stroke="#888" stroke-width="2"/>
+
+  <text x="120" y="852" fill="#cfcfcf" font-size="13" text-anchor="middle">0</text>
+  <text x="387" y="852" fill="#cfcfcf" font-size="13" text-anchor="middle">200</text>
+  <text x="920" y="852" fill="#cfcfcf" font-size="13" text-anchor="middle">600</text>
+
+  <!-- sample points -->
+  <circle cx="120" cy="820" r="9" fill="#caa14a" stroke="#fff" stroke-width="1.5"/>
+  <circle cx="387" cy="820" r="9" fill="#7ec46b" stroke="#fff" stroke-width="1.5"/>
+  <circle cx="920" cy="820" r="9" fill="#7ec46b" stroke="#fff" stroke-width="1.5"/>
+
+  <!-- sample labels -->
+  <rect x="60" y="760" width="170" height="44" rx="5" fill="#3a331f" stroke="#caa14a" stroke-width="1.2"/>
+  <text x="145" y="778" fill="#f0d488" font-size="13" text-anchor="middle" font-weight="bold">Walking_Anim</text>
+  <text x="145" y="796" fill="#bba66a" font-size="11" text-anchor="middle">(임시 Idle 대체)</text>
+  <line x1="145" y1="804" x2="122" y2="812" stroke="#caa14a" stroke-width="1.2"/>
+
+  <rect x="302" y="884" width="170" height="40" rx="5" fill="#26331f" stroke="#5e8a4a" stroke-width="1.2"/>
+  <text x="387" y="909" fill="#bcd6ad" font-size="13" text-anchor="middle" font-weight="bold">Walking_Anim</text>
+  <line x1="387" y1="884" x2="387" y2="829" stroke="#5e8a4a" stroke-width="1.2"/>
+
+  <rect x="835" y="884" width="170" height="40" rx="5" fill="#26331f" stroke="#5e8a4a" stroke-width="1.2"/>
+  <text x="920" y="909" fill="#bcd6ad" font-size="13" text-anchor="middle" font-weight="bold">Fast_Run_Anim</text>
+  <line x1="920" y1="884" x2="920" y2="829" stroke="#5e8a4a" stroke-width="1.2"/>
+
+  <text x="120" y="892" fill="#8a8a8a" font-size="12">정지</text>
+  <text x="387" y="958" fill="#8a8a8a" font-size="12" text-anchor="middle">걷기 (WalkAction 홀드)</text>
+  <text x="920" y="958" fill="#8a8a8a" font-size="12" text-anchor="middle">뛰기 (기본)</text>
+
+  <line x1="40" y1="990" x2="1000" y2="990" stroke="#2a2a2a" stroke-width="1"/>
+
+  <!-- ===== Section 5: Connection checklist ===== -->
+  <text x="40" y="1028" fill="#6db3f2" font-size="18" font-weight="bold">⑤ BP_BaekYon 연결 (Mesh 컴포넌트)</text>
+
+  <rect x="80" y="1050" width="880" height="120" rx="6" fill="#252525" stroke="#444" stroke-width="1.2"/>
+  <text x="104" y="1082" fill="#dddddd" font-size="14">• Skeletal Mesh Asset  =  백연 스켈레탈 메시</text>
+  <text x="104" y="1110" fill="#dddddd" font-size="14">• Anim Class  =  ABP_BaekYon</text>
+  <text x="104" y="1138" fill="#dddddd" font-size="14">• 세 애니 모두 Enable Root Motion = false (제자리 애니 확인)</text>
+
+  <!-- ===== Footer notes ===== -->
+  <rect x="40" y="1196" width="960" height="130" rx="6" fill="#2a2118" stroke="#7a5a30" stroke-width="1.2"/>
+  <text x="64" y="1226" fill="#f2c14e" font-size="15" font-weight="bold">⚠ 입력 충돌 / Idle 공백</text>
+  <text x="64" y="1254" fill="#e0d2b8" font-size="13">• Dash와 Jump가 Space에서 충돌 → Dash = Left Shift 단독, Jump = Space 로 분리 권장</text>
+  <text x="64" y="1280" fill="#e0d2b8" font-size="13">• Idle 애니 없음 → 현재 정지 시 Walking 제자리걸음 재생됨</text>
+  <text x="64" y="1306" fill="#e0d2b8" font-size="13">• Idle 확보 후: BS 0지점 교체 + Ground를 bShouldMove로 Idle↔BlendSpace 분기하면 완성</text>
+</svg>

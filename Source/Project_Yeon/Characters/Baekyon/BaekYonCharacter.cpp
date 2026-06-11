@@ -9,7 +9,6 @@
 
 ABaekYonCharacter::ABaekYonCharacter()
 {
-	// ── 카메라 ───────────────────────────────────────────────
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.f;
@@ -21,17 +20,14 @@ ABaekYonCharacter::ABaekYonCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
-	// ── 이동 설정 ─────────────────────────────────────────────
-	// 이동 방향으로 캐릭터가 회전 (카메라와 독립)
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw   = false;
 	bUseControllerRotationRoll  = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed; // 기본=걷기
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed; 
 
-	// ── 점프 ─────────────────────────────────────────────────
 	GetCharacterMovement()->JumpZVelocity = 500.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.f;
@@ -88,18 +84,19 @@ void ABaekYonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void ABaekYonCharacter::StartRun()
 {
-	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = FMath::FInterpTo(MaxWalkSpeed, RunSpeed, DeltaTime, InterpSpeed);
 }
 
 void ABaekYonCharacter::StopRun()
 {
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = FMath::FInterpTo(MaxWalkSpeed, WalkSpeed, DeltaTime, InterpSpeed);
 }
 
 // ── 이동 ─────────────────────────────────────────────────────────────────────
 
-void ABaekYonCharacter::Move(const FInputActionValue& Value)
+void ABaekYonCharacter::Move(const FInputActionValue& Value float DeltaTime)
 {
+	Super::Tick(DeltaTime);
 	const FVector2D Axis = Value.Get<FVector2D>();
 	if (Controller == nullptr || Axis.IsNearlyZero()) return;
 
@@ -107,8 +104,8 @@ void ABaekYonCharacter::Move(const FInputActionValue& Value)
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector Right   = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	AddMovementInput(Forward, Axis.Y);  // W/S → Y축 (Epic 표준)
-	AddMovementInput(Right,   Axis.X);  // A/D → X축
+	AddMovementInput(Forward, Axis.Y); 
+	AddMovementInput(Right,   Axis.X);
 }
 
 void ABaekYonCharacter::Look(const FInputActionValue& Value)
@@ -129,7 +126,6 @@ void ABaekYonCharacter::Dash()
 	bCanDash = false;
 	bIsInvincible = true;
 
-	// 이동 중이면 입력 방향, 아니면 전방으로 Dash
 	FVector Dir = GetLastMovementInputVector();
 	if (Dir.IsNearlyZero())
 	{
@@ -138,7 +134,6 @@ void ABaekYonCharacter::Dash()
 	Dir.Z = 0.f;
 	Dir.Normalize();
 
-	// LaunchCharacter로 순간 추진 — 실제 이동 거리는 플레이테스트 후 DashImpulse로 조정
 	LaunchCharacter(Dir * DashImpulse, true, false);
 
 	GetWorldTimerManager().SetTimer(

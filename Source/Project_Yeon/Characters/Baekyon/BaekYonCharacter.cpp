@@ -9,6 +9,10 @@
 
 ABaekYonCharacter::ABaekYonCharacter()
 {
+	// ── Tick 활성화 ───────────────────────────────────────────
+	PrimaryActorTick.bCanEverTick = true;
+
+	// ── 카메라 ───────────────────────────────────────────────
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.f;
@@ -20,14 +24,19 @@ ABaekYonCharacter::ABaekYonCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	// ── 이동 설정 ─────────────────────────────────────────────
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw   = false;
 	bUseControllerRotationRoll  = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 720.f, 0.f);
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed; 
+	
+	// 초기 속도 세팅
+	TargetMaxSpeed = WalkSpeed; 
+	GetCharacterMovement()->MaxWalkSpeed = 0.f; // 완전히 멈춘 상태에서 시작 (혹은 WalkSpeed)
 
+	// ── 점프 ─────────────────────────────────────────────────
 	GetCharacterMovement()->JumpZVelocity = 500.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.f;
@@ -82,30 +91,52 @@ void ABaekYonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
+// ── 매 프레임 가속도 및 감속 처리 (Tick) ───────────────────────────────────────
+
+void ABaekYonCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// 1. 입력이 완전히 없으면 목표 속도를 0으로 설정하여 감속 유도, 있으면 걷기/뛰기 상태 추종
+	float CurrentTarget = RawInputAxis.IsNearlyZero() ? 0.f : TargetMaxSpeed;
+
+	// 2. FInterpTo로 MaxWalkSpeed를 DeltaTime에 맞춰 부드럽게 조정
+	float NewSpeed = FMath::FInterpTo(GetCharacterMovement()->MaxWalkSpeed, CurrentTarget, DeltaTime, AccelerationRate);
+	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+
+	// 3. 입력이 있거나, 아직 속도가 남아 감속 중일 때 이동력을 계속 컴포넌트에 공급
+	if (!RawInputAxis.IsNearlyZero() || GetCharacterMovement()->Velocity.Size() > 10.f)
+	{
+		const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
+		const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector Right   = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		AddMovementInput(Forward, RawInputAxis.Y); // W/S
+		AddMovementInput(Right,   RawInputAxis.X); // A/D
+	}
+
+	// 4. Enhanced Input 특성에 맞춰 프레임이 끝날 때 입력축 초기화
+	RawInputAxis = FVector2D::ZeroVector;
+}
+
 void ABaekYonCharacter::StartRun()
 {
-	GetCharacterMovement()->MaxWalkSpeed = FMath::FInterpTo(MaxWalkSpeed, RunSpeed, DeltaTime, InterpSpeed);
+	TargetMaxSpeed = RunSpeed; // 런 키 누르고 있으면 목표 속도를 RunSpeed로 세팅
 }
 
 void ABaekYonCharacter::StopRun()
 {
-	GetCharacterMovement()->MaxWalkSpeed = FMath::FInterpTo(MaxWalkSpeed, WalkSpeed, DeltaTime, InterpSpeed);
+	TargetMaxSpeed = WalkSpeed; // 런 키 떼면 목표 속도를 WalkSpeed로 원복
 }
 
 // ── 이동 ─────────────────────────────────────────────────────────────────────
 
-void ABaekYonCharacter::Move(const FInputActionValue& Value float DeltaTime)
+void ABaekYonCharacter::Move(const FInputActionValue& Value)
 {
-	Super::Tick(DeltaTime);
-	const FVector2D Axis = Value.Get<FVector2D>();
-	if (Controller == nullptr || Axis.IsNearlyZero()) return;
+	if (Controller == nullptr) return;
 
-	const FRotator YawRotation(0.f, Controller->GetControlRotation().Yaw, 0.f);
-	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector Right   = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-	AddMovementInput(Forward, Axis.Y); 
-	AddMovementInput(Right,   Axis.X);
+	// 프레임마다 들어오는 입력값을 저장 (실제 이동 처리는 Tick에서 일괄 계산)
+	RawInputAxis = Value.Get<FVector2D>();
 }
 
 void ABaekYonCharacter::Look(const FInputActionValue& Value)
@@ -126,6 +157,7 @@ void ABaekYonCharacter::Dash()
 	bCanDash = false;
 	bIsInvincible = true;
 
+	// 이동 중이면 입력 방향, 아니면 전방으로 Dash
 	FVector Dir = GetLastMovementInputVector();
 	if (Dir.IsNearlyZero())
 	{
@@ -134,6 +166,7 @@ void ABaekYonCharacter::Dash()
 	Dir.Z = 0.f;
 	Dir.Normalize();
 
+	// LaunchCharacter로 순간 추진
 	LaunchCharacter(Dir * DashImpulse, true, false);
 
 	GetWorldTimerManager().SetTimer(

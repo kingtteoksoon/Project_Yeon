@@ -1,3 +1,5 @@
+// Copyright Kim seok-hyun, Inc. All Rights Reserved.
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -95,5 +97,5 @@ private:
 	float TargetMaxSpeed = 200.f;                   
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement", meta = (ClampMin = "0.1"))
-	float AccelerationRate = 8.0f;   
+	float AccelerationRate = 16.0f;   
 };

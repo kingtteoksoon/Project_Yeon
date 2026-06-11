@@ -1,3 +1,5 @@
+// Copyright Kim seok-hyun, Inc. All Rights Reserved.
+
 #include "YeonGameMode.h"
 
 AYeonGameMode::AYeonGameMode()

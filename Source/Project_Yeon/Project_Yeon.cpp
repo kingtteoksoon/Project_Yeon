@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Kim seok-hyun, Inc. All Rights Reserved.
 
 #include "Project_Yeon.h"
 #include "Modules/ModuleManager.h"
